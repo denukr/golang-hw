@@ -34,7 +34,6 @@ func getUserInput() (string, float64, string, error) {
 	}
 	number, err := getNumber()
 	if err != nil {
-		fmt.Printf("Что за чило?")
 		return "", 0, "", err
 	}
 	curA, curB, err := returnRemainingCurrencies(currentCurrancy)
