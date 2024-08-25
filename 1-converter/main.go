@@ -23,7 +23,7 @@ func main() {
 			continue
 		}
 		result, _ := convertCurrency(currentCurrancy, number, targetCurrency)
-		fmt.Printf("Результат: %v\n", result)
+		fmt.Printf("Результат:%v %v=%.2f %v\n", number, currentCurrancy, result, targetCurrency)
 		if !wantToContinue() {
 			break
 		}
@@ -130,7 +130,7 @@ func convertCurrency(currentCurrancy string, number float64, targetCurrancy stri
 
 func wantToContinue() bool {
 	var userAnswer string
-	fmt.Print("Желаете продолжить? (Y/N)")
+	fmt.Print("Желаете еще конверировать валюту? (Y/N)")
 	fmt.Scan(&userAnswer)
 	if userAnswer == "Y" || userAnswer == "y" {
 		return true
