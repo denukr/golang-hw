@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"strconv"
 )
 
 const (
@@ -14,9 +15,11 @@ const (
 func main() {
 	fmt.Println("__Конверетр валют__")
 	for {
+		var currentCurrancy, targetCurrency string
+		var number float64
 		currentCurrancy, number, targetCurrency, err := getUserInput()
 		if err != nil {
-			fmt.Println(err)
+			fmt.Printf("Ошибка: %v\n", err)
 			continue
 		}
 		result, _ := convertCurrency(currentCurrancy, number, targetCurrency)
@@ -34,7 +37,7 @@ func getUserInput() (string, float64, string, error) {
 	}
 	number, err := getNumber()
 	if err != nil {
-		return "", 0, "", err
+		return "", number, "", err
 	}
 	curA, curB, err := returnRemainingCurrencies(currentCurrancy)
 	if err != nil {
@@ -50,7 +53,8 @@ func getUserInput() (string, float64, string, error) {
 func getCurrentCurrency() (string, error) {
 	var currentCurrency string
 	fmt.Print("Введите исходную валюту (USD, Euro или Ruble): ")
-	switch fmt.Scan(&currentCurrency); currentCurrency {
+	fmt.Scan(&currentCurrency)
+	switch currentCurrency {
 	case "USD":
 		return currentCurrency, nil
 	case "Euro":
@@ -85,9 +89,14 @@ func getTargetCurrency(currencyA string, currencyB string) (string, error) {
 }
 
 func getNumber() (float64, error) {
-	var number float64
+	var numberStr string
 	fmt.Print("Введите число: ")
-	fmt.Scan(&number)
+	fmt.Scan(&numberStr)
+	num, err := strconv.Atoi(numberStr)
+	if err != nil {
+		return 0, errors.New("введено не число")
+	}
+	number := float64(num)
 	if number <= 0 {
 
 		return 0, errors.New("введено некорректное число")
