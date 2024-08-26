@@ -14,9 +14,12 @@ const (
 
 func main() {
 	fmt.Println("__Конверетр валют__")
+	fmt.Println("Меню:")
+	fmt.Println("1. Введите исходную валюту;")
+	fmt.Println("2. Введите число;")
+	fmt.Println("3. Введите целевую валюту.")
+	fmt.Printf("\n")
 	for {
-		var currentCurrancy, targetCurrency string
-		var number float64
 		currentCurrancy, number, targetCurrency, err := getUserInput()
 		if err != nil {
 			fmt.Printf("Ошибка: %v\n", err)
@@ -31,6 +34,7 @@ func main() {
 }
 
 func getUserInput() (string, float64, string, error) {
+
 	currentCurrancy, err := getCurrentCurrency()
 	for err != nil {
 		return "", 0, "", err
@@ -52,16 +56,11 @@ func getUserInput() (string, float64, string, error) {
 
 func getCurrentCurrency() (string, error) {
 	var currentCurrency string
-	fmt.Print("Введите исходную валюту (USD, Euro или Ruble): ")
+	fmt.Print("1. Введите исходную валюту (USD, Euro или Ruble): ")
 	fmt.Scan(&currentCurrency)
-	switch currentCurrency {
-	case "USD":
+	if currentCurrency == "USD" || currentCurrency == "Euro" || currentCurrency == "Ruble" {
 		return currentCurrency, nil
-	case "Euro":
-		return currentCurrency, nil
-	case "Ruble":
-		return currentCurrency, nil
-	default:
+	} else {
 		return "", errors.New("вы пытаетесь ввести валюту, которой у нас нет")
 	}
 }
@@ -81,7 +80,7 @@ func returnRemainingCurrencies(currentCurrency string) (string, string, error) {
 
 func getTargetCurrency(currencyA string, currencyB string) (string, error) {
 	var targetCurrency string
-	fmt.Printf("Введите целевую валюту (%v или %v): ", currencyA, currencyB)
+	fmt.Printf("3. Введите целевую валюту (%v или %v): ", currencyA, currencyB)
 	if fmt.Scan(&targetCurrency); targetCurrency == currencyA || targetCurrency == currencyB {
 		return targetCurrency, nil
 	}
@@ -90,7 +89,7 @@ func getTargetCurrency(currencyA string, currencyB string) (string, error) {
 
 func getNumber() (float64, error) {
 	var numberStr string
-	fmt.Print("Введите число: ")
+	fmt.Print("3. Введите число: ")
 	fmt.Scan(&numberStr)
 	num, err := strconv.Atoi(numberStr)
 	if err != nil {
@@ -132,6 +131,7 @@ func wantToContinue() bool {
 	var userAnswer string
 	fmt.Print("Желаете еще конверировать валюту? (Y/N)")
 	fmt.Scan(&userAnswer)
+	fmt.Printf("\n")
 	if userAnswer == "Y" || userAnswer == "y" {
 		return true
 	}
