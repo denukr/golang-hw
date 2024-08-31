@@ -1,3 +1,3 @@
-module 2-calc/calc
+module 2-calc/app
 
 go 1.23.0
