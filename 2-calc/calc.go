@@ -59,7 +59,7 @@ func calcMED(nums []float64) float64 {
 
 	if len(numsCopy)%2 != 0 {
 		return numsCopy[(len(numsCopy)-1)/2]
-	} else {
-		return calcAVG(numsCopy[(len(numsCopy)-1)/2 : (len(numsCopy)-1)/2+2])
 	}
+	return calcAVG(numsCopy[(len(numsCopy)-1)/2 : (len(numsCopy)-1)/2+2])
+
 }
