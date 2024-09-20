@@ -51,11 +51,3 @@ func NewStorage() (*Storage, error) {
 	return storage, nil
 }
 
-func ReadBinList(storage *Storage) ([]bins.Bin, error) {
-	storage, err := NewStorage()
-	if err != nil {
-		fmt.Println(err)
-		return nil, err
-	}
-	return storage.Bins, nil
-}
