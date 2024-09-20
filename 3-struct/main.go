@@ -1,15 +1,20 @@
 package main
 
 import (
-	"fmt"
-
-	"3-struct/app/api"
 	"3-struct/app/bins"
+	"3-struct/app/storage"
+	"fmt"
 )
 
 func main() {
-	testBin, _ := bins.NewBin("1", true, "test")
-	s := *testBin
-	fmt.Println(s)
-	api.Api()
+	myBin, _ := bins.NewBin("0", true, "myBin")
+
+	myStorage, err := storage.NewStorage()
+	if err != nil {
+		fmt.Print(err)
+	}
+	myStorage.AddBin(*myBin)
+	myStorage.Save()
+	res, _ := storage.ReadBinList(myStorage)
+	fmt.Println(res)
 }
