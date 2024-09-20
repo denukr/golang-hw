@@ -15,6 +15,4 @@ func main() {
 	}
 	myStorage.AddBin(*myBin)
 	myStorage.Save()
-	res, _ := storage.ReadBinList(myStorage)
-	fmt.Println(res)
 }
