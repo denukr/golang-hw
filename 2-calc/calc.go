@@ -7,6 +7,12 @@ import (
 	"strings"
 )
 
+var menu = map[string]func([]float64) float64{
+	"SUM": calcSUM,
+	"AVG": calcAVG,
+	"MED": calcMED,
+}
+
 func main() {
 	var operation, nums string
 	fmt.Print("Введите числа через запятую: ")
@@ -14,16 +20,8 @@ func main() {
 	fmt.Print("Введите операцию: ")
 	fmt.Scan(&operation)
 	a := convertStringToNumber(nums)
-	switch operation {
-	case "SUM":
-		fmt.Println(calcSUM(a))
-	case "AVG":
-		fmt.Println(calcAVG(a))
-	case "MED":
-		fmt.Println(calcMED(a))
-	default:
-		fmt.Println("Такой операции нет")
-	}
+	menuFunc := menu[operation]
+	fmt.Println(menuFunc(a))
 }
 
 func convertStringToNumber(nums string) []float64 {
