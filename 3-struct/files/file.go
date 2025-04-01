@@ -1,6 +1,7 @@
 package file
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -10,10 +11,14 @@ type JsonDb struct {
 	fileName string
 }
 
-func NewJsonDb(fileName string) *JsonDb {
-	return &JsonDb{
+func NewJsonDb(fileName string) (*JsonDb, error) {
+	db := &JsonDb{
 		fileName: fileName,
 	}
+	if !db.checkJSON() {
+		return nil, errors.New("Incorrect_File_Extension")
+	}
+	return db, nil
 }
 
 func (db *JsonDb) Read() ([]byte, error) {
@@ -39,10 +44,7 @@ func (db *JsonDb) Write(content []byte) {
 	fmt.Println("Запись успешна")
 }
 
-func checkJSON(path string) bool {
-	fileExtension := filepath.Ext(path)
-	if fileExtension == "json" {
-		return true
-	}
-	return false
+func (db *JsonDb) checkJSON() bool {
+	fileExtension := filepath.Ext(db.fileName)
+	return fileExtension == ".json"
 }

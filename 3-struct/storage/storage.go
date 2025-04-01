@@ -9,7 +9,7 @@ import (
 
 type Db interface {
 	Read() ([]byte, error)
-	Write(content []byte)
+	Write([]byte)
 }
 
 type Storage struct {
@@ -37,7 +37,7 @@ func (storage *StorageWithDb) Save() {
 }
 
 func (storage *StorageWithDb) ToBytes() ([]byte, error) {
-	data, err := json.Marshal(storage)
+	data, err := json.MarshalIndent(storage, "", "  ")
 	if err != nil {
 		fmt.Println(err)
 		return nil, err
