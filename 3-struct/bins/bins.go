@@ -6,10 +6,11 @@ import (
 )
 
 type Bin struct {
-	ID        string    `json: "id"`
-	Private   bool      `json: "private"`
-	CreatedAt time.Time `json: "createdAt"`
-	Name      string    `json: "name"`
+	ID        string    `json:"id"`
+	Private   bool      `json:"private"`
+	CreatedAt time.Time `json:"createdAt"`
+	Name      string    `json:"name"`
+	Content   []byte    `json:"content"`
 }
 
 func NewBin(id string, private bool, name string) (*Bin, error) {
