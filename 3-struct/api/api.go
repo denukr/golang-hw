@@ -4,6 +4,7 @@ import (
 	"3-struct/app/storage"
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -15,7 +16,7 @@ type RemoteDb struct {
 	URL string
 }
 
-func (db *RemoteDb) Write(data []byte, fileName string) {
+func (db *RemoteDb) Write(data []byte, fileName string) (binId string, err error) {
 	req, _ := http.NewRequest(http.MethodPost, db.URL+"/v3/b", bytes.NewBuffer(data))
 
 	// Это имя отобразится в панели управления JSONBin
@@ -26,7 +27,7 @@ func (db *RemoteDb) Write(data []byte, fileName string) {
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		fmt.Println("Ошибка сети")
-		return
+		return "", errors.New("ErrorNetwork")
 	}
 	defer resp.Body.Close()
 
@@ -41,6 +42,7 @@ func (db *RemoteDb) Write(data []byte, fileName string) {
 	// Записываем в локальный список, чтобы потом работал --list
 	db.updateLocalList(res.Metadata.ID, fileName)
 	fmt.Printf("Успешно! Бин создан. ID: %s\n", res.Metadata.ID)
+	return res.Metadata.ID, nil
 }
 
 func (db *RemoteDb) updateLocalList(id, name string) {
@@ -100,7 +102,7 @@ func (db *RemoteDb) Read(id string) ([]byte, error) {
 	return body, nil
 }
 
-func (db *RemoteDb) Update(id string, data []byte) {
+func (db *RemoteDb) Update(id string, data []byte) error {
 	req, _ := http.NewRequest(http.MethodPut, db.URL+"/v3/b/"+id, bytes.NewBuffer(data))
 	req.Header.Add("X-Master-Key", "$2a$10$u88mSOCNGh1sLLDIJ4YNluW7rrhNUCTAxPWswUGXSOTqp.nepc8Xm")
 	req.Header.Add("Content-Type", "application/json")
@@ -110,6 +112,9 @@ func (db *RemoteDb) Update(id string, data []byte) {
 	if err == nil {
 		resp.Body.Close()
 		fmt.Println("Bin updated successfully")
+		return nil
+	} else {
+		return err
 	}
 }
 
