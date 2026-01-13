@@ -1,29 +1,37 @@
 package main
 
 import (
+	"bufio"
+	"errors"
 	"fmt"
+	"os"
 	"sort"
 	"strconv"
 	"strings"
 )
 
+var menu = map[string]func([]float64) float64{
+	"SUM": calcSUM,
+	"AVG": calcAVG,
+	"MED": calcMED,
+}
+
 func main() {
-	var operation, nums string
-	fmt.Print("Введите числа через запятую: ")
-	fmt.Scan(&nums)
-	fmt.Print("Введите операцию: ")
-	fmt.Scan(&operation)
-	a := convertStringToNumber(nums)
-	switch operation {
-	case "SUM":
-		fmt.Println(calcSUM(a))
-	case "AVG":
-		fmt.Println(calcAVG(a))
-	case "MED":
-		fmt.Println(calcMED(a))
-	default:
-		fmt.Println("Такой операции нет")
+	nums, err := promptData("Введите числа через запятую")
+	if err != nil {
+		return
 	}
+	fmt.Println(nums)
+	operation, err := promptData("Введите операцию")
+	if err != nil {
+		return
+	}
+	a := convertStringToNumber(nums)
+	menuFunc := menu[operation]
+	if menuFunc == nil {
+		return
+	}
+	fmt.Println(menuFunc(a))
 }
 
 func convertStringToNumber(nums string) []float64 {
@@ -62,4 +70,24 @@ func calcMED(nums []float64) float64 {
 	}
 	return calcAVG(numsCopy[(len(numsCopy)-1)/2 : (len(numsCopy)-1)/2+2])
 
+}
+
+func promptData(prompt ...any) (string, error) {
+	for i, val := range prompt {
+		if i == len(prompt)-1 {
+			fmt.Printf("%v: ", val)
+		} else {
+			fmt.Println(val)
+		}
+	}
+	var result string
+	scanner := bufio.NewScanner(os.Stdin)
+	if scanner.Scan() {
+		result = scanner.Text()
+	}
+	err := scanner.Err()
+	if err != nil {
+		return "", errors.New("Stdin_ERROR")
+	}
+	return result, nil
 }

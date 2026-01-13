@@ -2,52 +2,60 @@ package storage
 
 import (
 	"3-struct/app/bins"
-	file "3-struct/app/files"
 	"encoding/json"
 	"fmt"
+	"os"
 	"time"
 )
 
+type BinInfo struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
+}
+
+type Db interface {
+	Read(id string) ([]byte, error)
+	Write(data []byte, fileName string)
+	Update(id string, data []byte)
+	Delete(id string) error
+	List() ([]BinInfo, error)
+}
+
 type Storage struct {
-	Bins     []bins.Bin `json: "bins"`
-	UpdateAt time.Time  `json: "updateAt"`
+	Bins     []bins.Bin `json:"bins"`
+	UpdateAt time.Time  `json:"updateAt"`
 }
 
-func (storage *Storage) AddBin(bin bins.Bin) {
-	storage.Bins = append(storage.Bins, bin)
+type StorageWithDb struct {
+	Storage
+	db Db
 }
 
-func (storage *Storage) Save() {
-	storage.UpdateAt = time.Now()
-	data, err := storage.ToBytes()
+// SaveNew теперь просто пересылает файл в DB (API)
+func (s *StorageWithDb) SaveNew(localPath string, cloudName string) {
+	// Читаем сырые байты из файла (например, {"Hello": 1})
+	content, err := os.ReadFile(localPath)
 	if err != nil {
-		fmt.Println(err)
+		fmt.Printf("Ошибка: файл %s не найден\n", localPath)
 		return
 	}
-	file.WriteFile(data, "data.json")
+
+	// Отправляем эти байты в API
+	s.db.Write(content, cloudName)
 }
 
-func (storage *Storage) ToBytes() ([]byte, error) {
-	data, err := json.Marshal(storage)
-	if err != nil {
-		fmt.Println(err)
-		return nil, err
-	}
-	return data, nil
+func (s *StorageWithDb) UpdateRemote(id string) {
+	s.UpdateAt = time.Now()
+	data, _ := json.MarshalIndent(s, "", "  ")
+	s.db.Update(id, data)
 }
 
-func NewStorage() (*Storage, error) {
-	data, err := file.ReadFile("data.json")
+func NewStorage(db Db, id string) (*StorageWithDb, error) {
+	data, err := db.Read(id)
 	if err != nil || len(data) == 0 {
-		fmt.Println(err)
-		return &Storage{}, nil
+		return &StorageWithDb{Storage: Storage{}, db: db}, nil
 	}
-	storage := &Storage{}
-	err = json.Unmarshal(data, storage)
-	if err != nil {
-		fmt.Println(err)
-		return nil, err
-	}
-	return storage, nil
+	var s Storage
+	err = json.Unmarshal(data, &s)
+	return &StorageWithDb{Storage: s, db: db}, err
 }
-

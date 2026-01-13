@@ -1,13 +1,28 @@
 package file
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
 )
 
-func ReadFile(name string) ([]byte, error) {
-	data, err := os.ReadFile(name)
+type JsonDb struct {
+	fileName string
+}
+
+func NewJsonDb(fileName string) (*JsonDb, error) {
+	db := &JsonDb{
+		fileName: fileName,
+	}
+	if !db.checkJSON() {
+		return nil, errors.New("Incorrect_File_Extension")
+	}
+	return db, nil
+}
+
+func (db *JsonDb) Read() ([]byte, error) {
+	data, err := os.ReadFile(db.fileName)
 	if err != nil {
 		fmt.Println(err)
 		return nil, err
@@ -15,8 +30,8 @@ func ReadFile(name string) ([]byte, error) {
 	return data, nil
 }
 
-func WriteFile(content []byte, name string) {
-	file, err := os.Create(name)
+func (db *JsonDb) Write(content []byte) {
+	file, err := os.Create(db.fileName)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -29,10 +44,7 @@ func WriteFile(content []byte, name string) {
 	fmt.Println("Запись успешна")
 }
 
-func checkJSON(path string) bool {
-	fileExtension := filepath.Ext(path)
-	if fileExtension == "json" {
-		return true
-	}
-	return false
+func (db *JsonDb) checkJSON() bool {
+	fileExtension := filepath.Ext(db.fileName)
+	return fileExtension == ".json"
 }
